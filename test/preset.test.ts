@@ -131,25 +131,25 @@ describe('Renovate shared preset', () => {
             );
         });
 
-        it('extracts package manager version from devEngines.packageManager', () => {
+        it('extracts package manager version from packageManager field', () => {
             writeFiles({
                 'renovate.json': presetConfig(),
                 'package.json': JSON.stringify({
-                    name: 'test-devengines',
+                    name: 'test-packagemanager',
                     version: '1.0.0',
-                    devEngines: { packageManager: { name: 'npm', version: '10.8.1' } },
+                    packageManager: 'pnpm@9.0.0',
                 }, null, 2),
             });
             commit();
 
             const result = runRenovate('extract');
 
-            expect(result.jsonata).toEqual(
+            expect(result.npm).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         packageFile: 'package.json',
                         deps: expect.arrayContaining([
-                            expect.objectContaining({ depName: 'npm', currentValue: '10.8.1' }),
+                            expect.objectContaining({ depName: 'pnpm', currentValue: '9.0.0' }),
                         ]),
                     }),
                 ]),
@@ -194,7 +194,7 @@ describe('Renovate shared preset', () => {
                 'package.json': JSON.stringify({
                     name: 'test-full',
                     version: '1.0.0',
-                    devEngines: { packageManager: { name: 'npm', version: '10.2.0' } },
+                    packageManager: 'pnpm@9.0.0',
                     dependencies: { lodash: '^4.17.21' },
                 }, null, 2),
                 '.github/workflows/ci.yml': [
@@ -215,14 +215,13 @@ describe('Renovate shared preset', () => {
             expect(managers).toContain('nvm');
             expect(managers).toContain('npm');
             expect(managers).toContain('github-actions');
-            expect(managers).toContain('jsonata');
         });
 
-        it('does not extract devEngines when field is absent', () => {
+        it('does not extract packageManager when field is absent', () => {
             writeFiles({
                 'renovate.json': presetConfig(),
                 'package.json': JSON.stringify({
-                    name: 'test-no-devengines',
+                    name: 'test-no-packagemanager',
                     version: '1.0.0',
                     dependencies: { lodash: '^4.17.21' },
                 }, null, 2),
@@ -232,10 +231,10 @@ describe('Renovate shared preset', () => {
             const result = runRenovate('extract');
 
             expect(result).toHaveProperty('npm');
-            const jsonataDeps = (result.jsonata ?? [])
+            const packageManagerDeps = (result.npm ?? [])
                 .flatMap((f) => f.deps)
-                .filter((d) => d.depName);
-            expect(jsonataDeps).toHaveLength(0);
+                .filter((d) => d.depName === 'pnpm');
+            expect(packageManagerDeps).toHaveLength(0);
         });
     });
 
@@ -289,26 +288,26 @@ describe('Renovate shared preset', () => {
             expect(semver.gt(tsNew, '4.0.0')).toBe(true);
         });
 
-        it('proposes an npm update for an outdated devEngines.packageManager', () => {
+        it('proposes a pnpm update for an outdated packageManager field', () => {
             writeFiles({
                 'renovate.json': presetConfig(),
                 'package.json': JSON.stringify({
-                    name: 'test-old-npm',
+                    name: 'test-old-pnpm',
                     version: '1.0.0',
-                    devEngines: { packageManager: { name: 'npm', version: '10.2.0' } },
+                    packageManager: 'pnpm@9.0.0',
                 }, null, 2),
             });
             commit();
 
             const result = runRenovate('lookup');
-            const dep = findDep(result, 'jsonata', 'npm');
+            const dep = findDep(result, 'npm', 'pnpm');
 
             expect(dep).toBeDefined();
             expect(dep!.updates!.length).toBeGreaterThan(0);
 
             const newVersion = dep!.updates![0].newVersion!;
             expect(semver.valid(newVersion)).toBeTruthy();
-            expect(semver.gt(newVersion, '10.2.0')).toBe(true);
+            expect(semver.gt(newVersion, '9.0.0')).toBe(true);
         });
     });
 });

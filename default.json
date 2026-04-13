@@ -5,19 +5,6 @@
     "config:recommended",
     "helpers:pinGitHubActionDigests"
   ],
-  "customManagers": [
-    {
-      "description": "Update package manager version in devEngines.packageManager",
-      "customType": "jsonata",
-      "fileFormat": "json",
-      "fileMatch": ["(^|/)package\\.json$"],
-      "matchStrings": [
-        "{ \"depName\": devEngines.packageManager.name, \"currentValue\": devEngines.packageManager.version }"
-      ],
-      "datasourceTemplate": "npm",
-      "versioningTemplate": "npm"
-    }
-  ],
   "packageRules": [
     {
       "description": "Group GitHub Actions updates",
