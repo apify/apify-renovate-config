@@ -5,6 +5,7 @@
     "config:recommended",
     "helpers:pinGitHubActionDigests"
   ],
+  "minimumReleaseAge": "1 day",
   "packageRules": [
     {
       "description": "Group GitHub Actions updates",
