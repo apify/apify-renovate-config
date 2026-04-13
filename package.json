@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "renovate": "^39.0.0",
+    "semver": "^7.7.4",
     "vitest": "^3.0.0"
   },
   "devEngines": {
