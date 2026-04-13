@@ -1,0 +1,17 @@
+{
+  "name": "@apify/renovate-config",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared Renovate configuration preset for Apify repositories",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "renovate-config-validator default.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "renovate": "^39.0.0",
+    "vitest": "^3.0.0"
+  }
+}
